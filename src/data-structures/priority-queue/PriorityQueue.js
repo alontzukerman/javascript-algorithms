@@ -1,98 +1,41 @@
-import MinHeap from '../heap/MinHeap';
-import Comparator from '../../utils/comparator/Comparator';
-
 // It is the same as min heap except that when comparing two elements
 // we take into account its priority instead of the element's value.
-export default class PriorityQueue extends MinHeap {
+export default class PriorityQueue {
   constructor() {
-    // Call MinHip constructor first.
-    super();
-
-    // Setup priorities map.
-    this.priorities = new Map();
-
-    // Use custom comparator for heap elements that will take element priority
-    // instead of element value into account.
-    this.compare = new Comparator(this.comparePriority.bind(this));
+    this.data = [] ;
   }
 
-  /**
-   * Add item to the priority queue.
-   * @param {*} item - item we're going to add to the queue.
-   * @param {number} [priority] - items priority.
-   * @return {PriorityQueue}
-   */
+  isEmpty() {
+    return this.data.length === 0 ;
+  }
+// [[100,0],[10,1],[5,3]]
   add(item, priority = 0) {
-    this.priorities.set(item, priority);
-    super.add(item);
-    return this;
-  }
-
-  /**
-   * Remove item from priority queue.
-   * @param {*} item - item we're going to remove.
-   * @param {Comparator} [customFindingComparator] - custom function for finding the item to remove
-   * @return {PriorityQueue}
-   */
-  remove(item, customFindingComparator) {
-    super.remove(item, customFindingComparator);
-    this.priorities.delete(item);
-    return this;
-  }
-
-  /**
-   * Change priority of the item in a queue.
-   * @param {*} item - item we're going to re-prioritize.
-   * @param {number} priority - new item's priority.
-   * @return {PriorityQueue}
-   */
-  changePriority(item, priority) {
-    this.remove(item, new Comparator(this.compareValue));
-    this.add(item, priority);
-    return this;
-  }
-
-  /**
-   * Find item by ite value.
-   * @param {*} item
-   * @return {Number[]}
-   */
-  findByValue(item) {
-    return this.find(item, new Comparator(this.compareValue));
-  }
-
-  /**
-   * Check if item already exists in a queue.
-   * @param {*} item
-   * @return {boolean}
-   */
-  hasValue(item) {
-    return this.findByValue(item).length > 0;
-  }
-
-  /**
-   * Compares priorities of two items.
-   * @param {*} a
-   * @param {*} b
-   * @return {number}
-   */
-  comparePriority(a, b) {
-    if (this.priorities.get(a) === this.priorities.get(b)) {
-      return 0;
+    if(this.isEmpty()) this.data.push([item,priority]);
+    else {
+      const index = this.data.findIndex((elem)=>elem[1] > priority);
+      if(index !== -1) this.data.splice(index,0,[item,priority]);
+      else {
+        this.data.push([item,priority]);
+      }
     }
-    return this.priorities.get(a) < this.priorities.get(b) ? -1 : 1;
+  }
+  peek() {
+    return this.data[0][0] ;
+  }
+  poll() {
+    return this.data.shift()[0] ;
   }
 
-  /**
-   * Compares values of two items.
-   * @param {*} a
-   * @param {*} b
-   * @return {number}
-   */
-  compareValue(a, b) {
-    if (a === b) {
-      return 0;
+  changePriority(item,priority) {
+    const index = this.data.findIndex(elem=>elem[0] === item);
+    if(index !== -1) {
+      this.data.splice(index,1);
+      this.add(item,priority);
     }
-    return a < b ? -1 : 1;
   }
+
+  hasValue(value) {
+    return this.data.findIndex(elem=>elem[0] ===value) !== -1 ;
+  }
+
 }
